@@ -40,19 +40,19 @@ Adjustment for spatiotemporal heterogeneity in the data
 
 Consider a Data Generating Process (DGP) in a panel setting with spatial-temporal correlations:
 
-Y_{it}\ =\ \beta\ X_{it}\ +\ u_i\ +\ v_t\ +\ \gamma_{it}{+\ \varepsilon}_{it}
+$$Y_{it}\ =  \beta\ X_{it}\ +\ u_i\ +\ v_t\ +\ \gamma_{it}{+\ \varepsilon}_{it} $$
 
-where u_i follows a standard spatial lag process, v_t follows a standard temporal lag, \gamma_{it} follow a spatial diffusion process (correlated with \gamma_{it-1}) and a true random error {\ \varepsilon}_{it}.
+where u_i follows a standard spatial lag process, v_t follows a standard temporal lag, $\gamma_{it}$ follow a spatial diffusion process (correlated with $\gamma_{it-1}$) and a true random error ${\varepsilon}_{it}$.
 
 4.1.1. Define different spatial-temporal error structures (allowing for spatial diffusion patterns, in the case of air pollution among others)
 
 Deforestation patterns.
 
-1.	Fish-bone.
+	1.	Fish-bone.
 
 Deforestation due to build or paved roads that generate side roads used by loggers or miners to reach their quarries, consequently this side roads spawn smaller ones creating the deforestation pattern of a “fish bone” (Figure 1).  95% of deforestation in Brazil Amazon has taken place within five and a half kilometers of a road or one kilometer of a navigable river. (F. Seymour, J. Busch. Why Forest, Why now, 2016)
 
-2.	Radial.
+	2.	Radial.
 
 Radial (or pie) patterns of land use is typical of new settlements or resettlement schemes and large agricultural development. For example, San Javier in the Santa Cruz Department of Bolivia, where tropical forest was cleared in the mid- 80’s to resettle people from the Altiplano in the context of the Tierra Baja project. At the center of each unit is a small community including a church, bar/café, school and soccer field (essentials of life in rural Bolivia)
 
@@ -60,13 +60,13 @@ Radial (or pie) patterns of land use is typical of new settlements or resettleme
 Figure 2, Source: Earth Observatory, Deforestation in Bolivia
 
 
-3.	Dendritic
+	3.	Dendritic
 
 Related to deforestation caused by miners and loggers that pushed into undeveloped parts of the forest, building roads that generally followed the natural contours of the land and formed curving, dendritic shapes.
 
 Figure 3, Source: Earth Observatory, Making Sense of Amazon Deforestation Patterns
 
-4.	Rectangular
+	4.	Rectangular
 
 This pattern of deforestation tends to leave large rectangular clearings that reflect careful surveying by large-scale cattle-ranching operations. In Paraguay deforestation has been widespread in the last years. From 1987 to 2012 Paraguay has lost near 44,000 square kilometers (17,000 square miles), mainly because of the expansion of cattle farms in the western part of the country.
 
