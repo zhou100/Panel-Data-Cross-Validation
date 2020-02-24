@@ -1,13 +1,66 @@
+################################################################################
+# Data generating process 
 # Code adapted from Andre's paper without the treatment or spatial aggregation
 
-# http://www.econ.uiuc.edu/~lab/workshop/Spatial_in_R.html#running-spatial-regressions
+# Steps
+# 1. create a raster grid as values of X 
+# 2. define a distribution for X 
+# 3. create patterns on the grid 
+# 4. create a spatial weight matrix in y 
+# 5. generate y 
+
+##############################################################################
+
+library(raster)
+library(splm) 
+library(tidyverse)
+library(reshape2)
+
+# Define extent
+lon_min = 0
+lat_min = 0
+lon_max = 25
+lat_max = 25
+
+grid_extent = extent(lon_min, lon_max, lat_min, lat_max)
+
+# Create the raster grid and get xy coordinates 
+grid_raster = raster(ext=grid_extent, resolution=1)
 
 
-# Data generating process  
+# 
+values(grid_raster) = 1:ncell(grid_raster)
 
-# Y = a + bX  + r WY + e
+#Extract cell centre coordinates
 
-# where a = b = 1 
+x_centres=xFromCol(rast1)
+y_centres=yFromRow(rast1)
+
+#Select some random points
+random_point_count = 0
+random_point_sample_number = 100 #the number of points you want
+
+
+
+mat1 = as.matrix(grid_raster)
+dat1 = melt(mat1)
+names(dat1) = c("easting","northing","value")
+
+#Shift over the easting and northing values by half pixel (ggplot uses coordinates as midpoints, whereas we want it to plot from the mid-point minus half a pixel lenght or width)
+
+dat1$easting = dat1$easting - 0.5
+dat1$northing = dat1$northing - 0.5
+
+p = ggplot(dat1, aes(x = easting, y = northing)) +
+  geom_tile(aes(fill=value), colour="grey20") +
+  scale_fill_gradientn(colours = terrain.colors(10)) +
+#  geom_point(data=random_points, mapping = aes(x=EASTING, y=NORTHING), colour="black") +
+  labs(x = "Easting", y = "Northing") #+ 
+#theme(legend.position = "none")
+
+p
+
+# Y = a + bX  + r WY + e， where a = b = 1 
 
 
 # Y is land use (binary: 0 if deforestation, 1 if covered )
@@ -20,6 +73,9 @@
 # 2. X = (1- piW)K  or X = W^2 K , with K ~ U (0,5) 
 
 # Y is also a function of contiguous parcels W, where our spatial matrix come in to depict the deforestation patterns.
+
+
+
 
 
 # OLS 
@@ -42,9 +98,7 @@
 ############################################
 
 # Functions used 
-library(splm)
-library(Matching)
-library(MatchIt)
+
 
 # Spatial weights for neighbours lists
 ?nb2listw
@@ -61,7 +115,7 @@ p=1
 eval(parse(text = paste("Wn", p, "= as(as_dgRMatrix_listw(nb2listw(cell2nb(size, size, type = \"queen\"))), \"CsparseMatrix\")", sep = "")))
 
 
-eval(parse(text = paste("Wl", p, "= as(as_dgRMatrix_listw(nb2listw(cell2nb(size, size, type = \"queen\"))))", sep = "")))
+# eval(parse(text = paste("Wl", p, "= as(as_dgRMatrix_listw(nb2listw(cell2nb(size, size, type = \"queen\"))))", sep = "")))
 
 
 
@@ -70,10 +124,6 @@ eval(parse(text = paste("Wl", p, "= as(as_dgRMatrix_listw(nb2listw(cell2nb(size,
 # but one that was more linear
 
 # Y = bX + a 
-
-
-
-
 
 
 
