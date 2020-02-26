@@ -3,11 +3,11 @@
 # Code adapted from Andre's paper without the treatment or spatial aggregation
 
 # Steps
-# 1. create a raster grid as values of X 
-# 2. define a distribution for X 
-# 3. create patterns on the grid 
-# 4. create a spatial weight matrix in y 
-# 5. generate y 
+# 1. create a raster grid as values of X and T
+# 2. Define a distribution for X 
+# 3. create patterns on the grid for T 
+# 4. create a spatial weight matrix in Y   
+# 5. generate y based on the values of X, T, and spatial weight matrix of Y 
 
 ##############################################################################
 
@@ -17,48 +17,97 @@ library(tidyverse)
 library(reshape2)
 
 # Define extent
+
+grid_size = 25 
+
 lon_min = 0
 lat_min = 0
-lon_max = 25
-lat_max = 25
+lon_max = grid_size
+lat_max = grid_size
 
 grid_extent = extent(lon_min, lon_max, lat_min, lat_max)
 
 # Create the raster grid and get xy coordinates 
 grid_raster = raster(ext=grid_extent, resolution=1)
 
-
-# 
+# fill with random X (such as slope, soil  with some patterns in value)
 values(grid_raster) = 1:ncell(grid_raster)
 
-#Extract cell centre coordinates
+slope_error = runif(grid_size^2, min = 40, max = 100)
 
-x_centres=xFromCol(rast1)
-y_centres=yFromRow(rast1)
-
-#Select some random points
-random_point_count = 0
-random_point_sample_number = 100 #the number of points you want
+# X with error
+plot(grid_raster+slope_error)
 
 
 
-mat1 = as.matrix(grid_raster)
-dat1 = melt(mat1)
-names(dat1) = c("easting","northing","value")
 
-#Shift over the easting and northing values by half pixel (ggplot uses coordinates as midpoints, whereas we want it to plot from the mid-point minus half a pixel lenght or width)
+##############################################
+# 1. radial pattern: define T as circular points 
+###################################################################
 
-dat1$easting = dat1$easting - 0.5
-dat1$northing = dat1$northing - 0.5
+radial_grid = grid_raster 
 
-p = ggplot(dat1, aes(x = easting, y = northing)) +
-  geom_tile(aes(fill=value), colour="grey20") +
-  scale_fill_gradientn(colours = terrain.colors(10)) +
-#  geom_point(data=random_points, mapping = aes(x=EASTING, y=NORTHING), colour="black") +
-  labs(x = "Easting", y = "Northing") #+ 
-#theme(legend.position = "none")
+ 
+# Consider “Treatment” (human activities) as distance-based,
+# with intensity varying with distance from the center. 
 
-p
+xy_center = c(grid_size/2,grid_size/2)
+
+dist_radial <- 100000/distanceFromPoints(radial_grid,xy_center ) 
+
+radial_error = runif(grid_size^2, min = 0, max = 0.3)
+
+plot(dist_radial+radial_error)
+
+   
+
+
+dist_radial.matrix= as.matrix(dist_radial+radial_error)
+
+# create points with distance to center at given intervals 
+
+
+##############################################
+# 2. fishbone pattern: define T as roads 
+###################################################################
+
+fishbone_grid = grid_raster
+
+# set the back ground to 0 
+values(fishbone_grid)=0
+
+# choose the index of the main road
+grid_range = (grid_size*12+5) :(grid_size*12+23)
+
+# set the main road value to be 1 
+values(fishbone_grid)[grid_range] = 1
+
+
+plot(fishbone_grid)
+
+
+# randomly choose index where the side roads will emerge 
+
+random_index = sample(grid_range)[1:10]
+
+# for each index, generate north or south road
+
+for (j in 1:length(random_index)){
+  
+  # randomly choose north or south, i.e. i randomly equals 1 or -1 
+  i= floor(runif(1, 0, 2)) * 2 - 1
+  
+  values(fishbone_grid)[random_index[j]+i*grid_size]=1
+  values(fishbone_grid)[random_index[j]+i*grid_size*2]=1
+  values(fishbone_grid)[random_index[j]+i*grid_size*3]=1
+}
+plot(fishbone_grid)
+ 
+
+
+
+
+
 
 # Y = a + bX  + r WY + e， where a = b = 1 
 
