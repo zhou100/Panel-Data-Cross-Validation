@@ -30,7 +30,7 @@ grid_extent = extent(lon_min, lon_max, lat_min, lat_max)
 # Create the raster grid and get xy coordinates 
 grid_raster = raster(ext=grid_extent, resolution=1)
 
-# fill with random X (such as slope, soil  with some patterns in value)
+# fill with random X (such as slope, soil  with patterns in value related to lontitude and latitude)
 values(grid_raster) = 1:ncell(grid_raster)
 
 slope_error = runif(grid_size^2, min = 40, max = 100)
@@ -46,18 +46,42 @@ plot(grid_raster+slope_error)
 ###################################################################
 
 radial_grid = grid_raster 
-
  
 # Consider “Treatment” (human activities) as distance-based,
+
 # with intensity varying with distance from the center. 
 
-xy_center = c(grid_size/2,grid_size/2)
+# lat_lon_center = c(grid_size/2,grid_size/2)
+
+
+
+
+# define multiple centers 
+num_centers = 40
+
+lat_coord = sample(1:grid_size, size = num_centers)
+lon_coord = sample(1:grid_size, size = num_centers)
+lat_lon_centers = mapply(c, lat_coord, lon_coord, SIMPLIFY = TRUE)
+
+for (i in 1:length(num_centers)){
+  if (i>1){
+    min_dist = min(min_dist, distanceFromPoints(radial_grid,lat_lon_centers[,i]))
+  }
+  
+  min_dist = distanceFromPoints(radial_grid,lat_lon_centers[,i]) 
+}
+
+plot(min_dist)
+
+                  
 
 dist_radial <- 100000/distanceFromPoints(radial_grid,xy_center ) 
 
 radial_error = runif(grid_size^2, min = 0, max = 0.3)
 
-plot(dist_radial+radial_error)
+plot(min_dist+radial_error)
+
+min_dist
 
    
 
