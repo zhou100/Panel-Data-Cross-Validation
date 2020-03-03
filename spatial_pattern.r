@@ -57,7 +57,7 @@ radial_grid = grid_raster
 
 
 # define multiple centers 
-num_centers = 40
+num_centers = 5
 
 lat_coord = sample(1:grid_size, size = num_centers)
 lon_coord = sample(1:grid_size, size = num_centers)
@@ -65,15 +65,26 @@ lat_lon_centers = mapply(c, lat_coord, lon_coord, SIMPLIFY = TRUE)
 
 for (i in 1:length(num_centers)){
   if (i>1){
-    min_dist = min(min_dist, distanceFromPoints(radial_grid,lat_lon_centers[,i]))
+    temp_matrix = as.matrix (distanceFromPoints(radial_grid,lat_lon_centers[,i])) 
+    
+    for (row_index in 1:grid_size){
+      for (col_index in 1:grid_size){
+        
+        min_dist[row_index,col_index] = min( min_dist[row_index,col_index], temp_matrix[row_index,col_index] ) 
+        
+      }
+    }
+  
+  
   }
   
-  min_dist = distanceFromPoints(radial_grid,lat_lon_centers[,i]) 
+  min_dist = as.matrix(distanceFromPoints(radial_grid,lat_lon_centers[,i]))
 }
 
-plot(min_dist)
 
-                  
+plot(raster(100000/as.matrix(min_dist)))
+
+  
 
 dist_radial <- 100000/distanceFromPoints(radial_grid,xy_center ) 
 
