@@ -14,11 +14,10 @@
 library(raster)
 library(splm) 
 library(tidyverse)
-library(reshape2)
 
 # Define extent
 
-grid_size = 25 
+grid_size = 250
 
 lon_min = 0
 lat_min = 0
@@ -54,37 +53,63 @@ radial_grid = grid_raster
 # lat_lon_center = c(grid_size/2,grid_size/2)
 
 
-
-
 # define multiple centers 
-num_centers = 5
 
-lat_coord = sample(1:grid_size, size = num_centers)
-lon_coord = sample(1:grid_size, size = num_centers)
-lat_lon_centers = mapply(c, lat_coord, lon_coord, SIMPLIFY = TRUE)
-
-for (i in 1:length(num_centers)){
-  if (i>1){
-    temp_matrix = as.matrix (distanceFromPoints(radial_grid,lat_lon_centers[,i])) 
-    
-    for (row_index in 1:grid_size){
-      for (col_index in 1:grid_size){
-        
-        min_dist[row_index,col_index] = min( min_dist[row_index,col_index], temp_matrix[row_index,col_index] ) 
-        
-      }
+dist_compute = function(num_centers, lat_lon_centers ){
+  
+  for (i in 1:length(num_centers)){
+    if (i==1){
+      min_dist = as.matrix(distanceFromPoints(radial_grid,lat_lon_centers[,i]))
     }
-  
-  
+      
+    else{
+      temp_matrix = as.matrix (distanceFromPoints(radial_grid,lat_lon_centers[,i]))
+      for (row_index in 1:grid_size){
+        for (col_index in 1:grid_size){
+          
+          temp_dist = temp_matrix[row_index,col_index]
+          current_dist = min_dist[row_index,col_index]
+          
+          min_dist[row_index,col_index] = min( temp_dist, current_dist ) 
+          
+        }
+      }
+      
+     
+      
+    }
+       
+      
+      
   }
-  
-  min_dist = as.matrix(distanceFromPoints(radial_grid,lat_lon_centers[,i]))
+
+  return(min_dist)
 }
 
 
-plot(raster(100000/as.matrix(min_dist)))
+
+num_centers = 25
+
+lat_coord = sample(1:grid_size, size = num_centers)
+lon_coord = sample(1:grid_size, size = num_centers)
+
+lat_lon_centers = mapply(c, lat_coord, lon_coord, SIMPLIFY = TRUE)
+plot(raster(10000/as.matrix(dist_compute(num_centers = num_centers, lat_lon_centers = lat_lon_centers))))
+
+
+
+temp_matrix = as.matrix (distanceFromPoints(radial_grid,lat_lon_centers[,i])) 
+temp_matrix[25,25]
+
+#temp_matrix = as.matrix (distanceFromPoints(radial_grid,lat_lon_centers[,2])) 
+
+#min_dist - temp_matrix
+
 
   
+min_dist
+
+temp_matrix
 
 dist_radial <- 100000/distanceFromPoints(radial_grid,xy_center ) 
 
